@@ -1,11 +1,16 @@
 {
   "name": "Freddy Chat",
   "short_name": "Freddy",
-  "start_url": ".",
+  "start_url": "https://makola000.github.io/freddy-site/",
   "display": "standalone",
   "background_color": "#111b21",
   "theme_color": "#25D366",
   "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/733/733585.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
     {
       "src": "https://cdn-icons-png.flaticon.com/512/733/733585.png",
       "sizes": "512x512",
