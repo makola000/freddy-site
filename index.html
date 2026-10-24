@@ -3,44 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Freddy Chat - L'IA qui parle congolais</title>
+<title>FREDDY CHAT - MONDIAL 🌍</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,sans-serif}
-body{background:#0a0a0a;color:white;min-height:100vh;display:flex;flex-direction:column;align-items:center}
-header{width:100%;padding:20px 30px;display:flex;justify-content:space-between;align-items:center;max-width:1100px}
-.logo{font-weight:900;font-size:22px;letter-spacing:-1px}
-.logo span{color:#00ff88}
-.btn{background:#00ff88;color:black;padding:10px 20px;border-radius:100px;font-weight:700;text-decoration:none}
-.hero{margin-top:60px;text-align:center;padding:0 20px;max-width:800px}
-.hero h1{font-size:56px;line-height:0.95;letter-spacing:-3px;font-weight:900}
-.hero h1 span{color:#00ff88}
-.hero p{margin-top:20px;color:#aaa;font-size:18px;line-height:1.5}
-.chat-box{margin-top:40px;background:#161616;border:1px solid #222;width:100%;max-width:600px;border-radius:24px;padding:20px;text-align:left}
-.msg{padding:12px 16px;border-radius:18px;margin-bottom:12px;max-width:80%;font-size:15px}
-.user{background:#00ff88;color:black;margin-left:auto;border-bottom-right-radius:4px}
-.bot{background:#222;color:white;border-bottom-left-radius:4px}
-.input{margin-top:15px;background:#0a0a0a;border:1px solid #333;border-radius:100px;padding:14px 20px;display:flex;justify-content:space-between;color:#666}
-footer{margin-top:auto;padding:40px;color:#444;font-size:13px}
+*{box-sizing:border-box;font-family:sans-serif}
+body{margin:0;background:#111b21;color:white;display:flex;flex-direction:column;height:100vh}
+.header{background:#202c33;padding:15px;text-align:center;font-weight:bold;font-size:20px;color:#25D366}
+#messages{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:75%;padding:10px 14px;border-radius:10px;word-break:break-word}
+.me{align-self:flex-end;background:#005c4b}
+.other{align-self:flex-start;background:#202c33}
+.input-area{display:flex;padding:10px;background:#202c33;gap:8px}
+input{padding:12px;border-radius:20px;border:none;outline:none}
+#nameInput{width:90px}
+#msgInput{flex:1}
+button{padding:12px 18px;border-radius:20px;border:none;background:#25D366;color:white;font-weight:bold}
 </style>
 </head>
 <body>
-<header>
-<div class="logo">FREDDY <span>CHAT</span></div>
-<a class="btn" href="#">Ouvrir l'app</a>
-</header>
-
-<div class="hero">
-<h1>L'IA qui comprend <span>vraiment</span> Kinshasa.</h1>
-<p>Freddy Chat parle Lingala, Français et Tshiluba. Rapide, même avec une connexion lente. Fait par Freddy, pour le Congo.</p>
-
-<div class="chat-box">
-<div class="msg bot">Yo Freddy ! Oza wapi ? Ton site marche bien ? 🎉</div>
-<div class="msg user">Oui, il est en ligne ! makola000.github.io/freddy-site</div>
-<div class="msg bot">Boom ! Tu as réussi. Prochaine étape : ajouter l'IA ?</div>
-<div class="input"><span>Tape un message...</span><span>➤</span></div>
-</div>
+<div class="header">FREDDY CHAT 🌍 MONDIAL</div>
+<div id="messages"></div>
+<div class="input-area">
+<input id="nameInput" placeholder="Nom">
+<input id="msgInput" placeholder="Message...">
+<button onclick="send()">Envoyer</button>
 </div>
 
-<footer>© 2026 Freddy Chat - Fait à Kinshasa 🇨🇩</footer>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDfdD2GeWkP3_jR0UOF8XOo0YY2OHhh7_A",
+  authDomain: "freddy-chat-d7685.firebaseapp.com",
+  databaseURL: "https://freddy-chat-d7685-default-rtdb.firebaseio.com",
+  projectId: "freddy-chat-d7685",
+  storageBucket: "freddy-chat-d7685.firebasestorage.app",
+  messagingSenderId: "995847135839",
+  appId: "1:995847135839:web:cb599b4ec1798a7a0cb1ea",
+  measurementId: "G-8SJX6NZFX9"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const chatRef = ref(db, "messages");
+
+const messagesDiv = document.getElementById("messages");
+
+onChildAdded(chatRef, (snap) => {
+  const data = snap.val();
+  const div = document.createElement("div");
+  const myName = document.getElementById("nameInput").value;
+  div.className = "msg " + (data.name === myName ? "me" : "other");
+  div.innerHTML = `<b>${data.name}</b><br>${data.text}`;
+  messagesDiv.appendChild(div);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+});
+
+window.send = function() {
+  const name = document.getElementById("nameInput").value || "Anonyme";
+  const text = document.getElementById("msgInput").value;
+  if(!text.trim()) return;
+  push(chatRef, { name: name, text: text, time: Date.now() });
+  document.getElementById("msgInput").value = "";
+}
+
+document.getElementById("msgInput").addEventListener("keydown", (e)=>{
+  if(e.key==="Enter") send();
+});
+</script>
 </body>
 </html>
