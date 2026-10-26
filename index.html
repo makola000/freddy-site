@@ -1,73 +1,41 @@
-<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FREDDY V8 - Tout en Un</title><style>*{box-sizing:border-box;margin:0;font-family:system-ui}body{background:#111b21;color:#fff;display:flex;height:100vh}aside{width:70px;background:#202c33;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:14px}aside b{width:45px;height:45px;background:#2a3942;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px}aside b.act{background:#00a884}main{flex:1;display:flex;flex-direction:column;background:#0b141a}.top{background:#202c33;padding:10px 14px;display:flex;gap:10px;align-items:center}input.s{flex:1;padding:10px 14px;border-radius:20px;border:none;background:#2a3942;color:#fff;outline:none}#content{flex:1;overflow:auto;padding:10px}#chatBox{display:flex;flex-direction:column;gap:6px}.msg{max-width:75%;padding:8px 12px;border-radius:8px;font-size:14px}.me{align-self:flex-end;background:#005c4b}.other{align-self:flex-start;background:#202c33}.card{background:#202c33;padding:12px;border-radius:10px;margin-bottom:8px}.btn{padding:8px 12px;border-radius:8px;border:none;background:#00a884;color:#fff;cursor:pointer;margin:2px}.small{font-size:11px;color:#8696a0}img.prev{width:100%;border-radius:8px;margin-top:6px}</style></head><body>
-<aside>
-<b id="b-chat" class="act" onclick="openTab('chat')">💬</b>
-<b id="b-stat" onclick="openTab('stat')">⭕</b>
-<b id="b-call" onclick="openTab('call')">📞</b>
-<b id="b-yt" onclick="openTab('yt')">▶️</b>
-<b id="b-gg" onclick="openTab('gg')">G</b>
-<b id="b-wiki" onclick="openTab('wiki')">W</b>
-<b id="b-ph" onclick="openTab('ph')">🖼️</b>
-</aside>
-<main>
-<div class="top">
-<span id="title">FREDDY V8</span>
-<input id="q" class="s" placeholder="Rechercher / taper message..." onkeydown="if(event.key==='Enter'){if(curTab==='chat')sendMsg();else doSearch()}">
-<button class="btn" onclick="curTab==='chat'?sendMsg():doSearch()">➤</button>
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Freddy V8 - Tout en Un</title>
+<style>
+body{margin:0;font-family:system-ui;background:#0f172a;color:#fff}
+header{padding:15px;text-align:center;background:#1e293b;position:sticky;top:0}
+.search{max-width:650px;margin:15px auto;display:flex;gap:6px;padding:0 10px}
+.search input{flex:1;padding:13px;border-radius:25px;border:none;outline:none}
+.search button{padding:13px 20px;border-radius:25px;border:none;background:#25D366;color:#fff;font-weight:bold}
+.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px}
+.tab{padding:8px 14px;background:#334155;border-radius:20px;cursor:pointer}
+.tab.act{background:#25D366;color:#000;font-weight:bold}
+#view{height:75vh;background:#fff;border-radius:12px;margin:10px;overflow:hidden}
+iframe{width:100%;height:100%;border:none}
+</style></head><body>
+<header><h2>🚀 Freddy V8 - Recherche Totale</h2></header>
+<div class="search"><input id="q" placeholder="Chercher une personne, vidéo, lieu..." onkeydown="if(event.key==='Enter')go()"><button onclick="go()">GO</button></div>
+<div class="tabs">
+<div id="t-g" class="tab act" onclick="openT('g')">Google</div>
+<div id="t-yt" class="tab" onclick="openT('yt')">YouTube</div>
+<div id="t-w" class="tab" onclick="openT('w')">Wiki</div>
+<div id="t-wa" class="tab" onclick="openT('wa')">WhatsApp</div>
+<div id="t-fb" class="tab" onclick="openT('fb')">Facebook</div>
+<div id="t-m" class="tab" onclick="openT('m')">Maps</div>
 </div>
-<div id="content"></div>
-<div id="actions" style="padding:8px;background:#202c33;display:flex;gap:6px;flex-wrap:wrap">
-<button class="btn" onclick="addContact()">👤+ Contact</button>
-<button class="btn" onclick="sharePhoto()">📷 Photo</button>
-<button class="btn" onclick="shareVideo()">🎥 Vidéo</button>
-<button class="btn" onclick="shareVoice()">🎤 Voice</button>
-<button class="btn" onclick="shareStatus()">📝 Statut</button>
-</div>
-</main>
+<div id="view"></div>
 <script>
-let curTab='chat';
-let store=JSON.parse(localStorage.getItem('FREDDY_V8')||'{"msgs":[],"contacts":["Maman","Papa","Enfants"],"status":[],"photos":[]}');
-function save(){localStorage.setItem('FREDDY_V8',JSON.stringify(store));}
-function openTab(t){curTab=t;document.querySelectorAll('aside b').forEach(b=>b.classList.remove('act'));document.getElementById('b-'+t).classList.add('act');render();}
-function render(){
- let c=document.getElementById('content');
- if(curTab==='chat'){
-  document.getElementById('title').innerText='Discussions - Messages qui RESTENT';
-  let h='<div id="chatBox">';
-  if(store.msgs.length==0)h+='<div class="card">Bienvenue Freddy 👋 Tous les messages avec les enfants resteront ici pour toujours. Rien ne sera effacé.</div>';
-  store.msgs.forEach(m=>{h+=`<div class="msg ${m.me?'me':'other'}"><b>${m.from}</b><br>${m.text}${m.img?`<img class="prev" src="${m.img}">`:''}<br><span class="small">${m.time}</span></div>`});
-  h+='</div>';c.innerHTML=h;c.scrollTop=c.scrollHeight;
- }
- if(curTab==='stat'){
-  document.getElementById('title').innerText='Statuts';
-  let h='';store.status.forEach(s=>h+=`<div class="card">⭕ <b>${s.from}</b><br>${s.text}<br><span class="small">${s.time}</span></div>`);
-  c.innerHTML=h||'<div class="card">Pas encore de statuts</div>';
- }
- if(curTab==='call'){
-  document.getElementById('title').innerText='Appels & Voices';
-  c.innerHTML=`<div class="card">📞 Appels enregistrés :<br>${store.contacts.map(c=>`• ${c} <button class="btn" onclick="fakeCall('${c}')">Appeler</button>`).join('<br>')}</div><div class="card">🎤 Voices : ${store.msgs.filter(m=>m.text.includes('🎤')).length} messages vocaux enregistrés</div>`;
- }
- if(curTab==='yt'){document.getElementById('title').innerText='YouTube intégré';c.innerHTML=`<iframe style="width:100%;height:80vh;border:none;border-radius:12px" src="https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(document.getElementById('q').value||'comptines enfants')}"></iframe>`;}
- if(curTab==='gg'){document.getElementById('title').innerText='Google intégré';c.innerHTML=`<iframe style="width:100%;height:80vh;border:none;background:#fff;border-radius:12px" src="https://www.google.com/search?q=${encodeURIComponent(document.getElementById('q').value||'Kinshasa')}&igu=1"></iframe>`;}
- if(curTab==='wiki'){document.getElementById('title').innerText='Wikipedia';c.innerHTML=`<iframe style="width:100%;height:80vh;border:none;background:#fff;border-radius:12px" src="https://fr.wikipedia.org/wiki/${encodeURIComponent(document.getElementById('q').value||'République_démocratique_du_Congo')}"></iframe>`;}
- if(curTab==='ph'){document.getElementById('title').innerText='Photos & Vidéos partagées';let h='';store.photos.forEach(p=>h+=`<div class="card"><b>${p.from}</b><br><img class="prev" src="${p.data}"><br><span class="small">${p.time}</span></div>`);c.innerHTML=h||'<div class="card">Aucune photo partagée. Clique sur 📷 Photo</div>';}
+let cur='g';
+function openT(t){cur=t;document.querySelectorAll('.tab').forEach(e=>e.classList.remove('act'));document.getElementById('t-'+t).classList.add('act');go();}
+function go(){
+let q=document.getElementById('q').value||'Kinshasa';
+let v=document.getElementById('view');
+if(cur==='g') v.innerHTML=`<iframe src="https://www.google.com/search?q=${encodeURIComponent(q)}&igu=1"></iframe>`;
+if(cur==='yt') v.innerHTML=`<iframe src="https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(q)}"></iframe>`;
+if(cur==='w') v.innerHTML=`<iframe src="https://fr.wikipedia.org/wiki/${encodeURIComponent(q)}"></iframe>`;
+if(cur==='wa') v.innerHTML=`<iframe src="https://wa.me/?text=${encodeURIComponent(q)}"></iframe>`;
+if(cur==='fb') v.innerHTML=`<iframe src="https://www.facebook.com/search/top/?q=${encodeURIComponent(q)}"></iframe>`;
+if(cur==='m') v.innerHTML=`<iframe src="https://www.google.com/maps/search/${encodeURIComponent(q)}/"></iframe>`;
 }
-function sendMsg(){
- let t=document.getElementById('q').value;if(!t)return;
- store.msgs.push({from:'Moi',text:t,me:true,time:new Date().toLocaleString()});document.getElementById('q').value='';save();render();
- setTimeout(()=>{store.msgs.push({from:'Enfants',text:'Reçu : '+t,me:false,time:new Date().toLocaleString()});save();render();},800);
-}
-function addContact(){let n=prompt('Nom du contact :');if(n){store.contacts.push(n);save();render();}}
-function sharePhoto(){
- let url=prompt('Colle lien photo ou tape OK pour exemple :');if(url===null)return;
- if(!url)url='https://picsum.photos/300/200';
- store.photos.push({from:'Moi',data:url,time:new Date().toLocaleString()});
- store.msgs.push({from:'Moi',text:'📷 Photo partagée',img:url,me:true,time:new Date().toLocaleString()});
- save();render();alert('Photo partagée et sauvegardée !');
-}
-function shareVideo(){let u=prompt('Lien YouTube à partager :');if(u){store.msgs.push({from:'Moi',text:'🎥 Vidéo : '+u,me:true,time:new Date().toLocaleString()});save();render();}}
-function shareVoice(){store.msgs.push({from:'Moi',text:'🎤 Message vocal [0:12]',me:true,time:new Date().toLocaleString()});save();render();}
-function shareStatus(){let s=prompt('Ton statut :');if(s){store.status.push({from:'Moi',text:s,time:new Date().toLocaleString()});save();render();}}
-function fakeCall(n){alert('📞 Appel vers '+n+'... (simulation) - Appel enregistré dans V8');store.msgs.push({from:'Système',text:'📞 Appel avec '+n,me:false,time:new Date().toLocaleString()});save();}
-function doSearch(){render();}
-render();
+go();
 </script></body></html>
